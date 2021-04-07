@@ -1,0 +1,31 @@
+plugins{
+    id 'java'
+}
+
+group 'org.tony'
+version '3.3.1'
+
+repositories {
+    flatDir dirs: 'libs'
+    mavenCentral()
+}
+compileJava.options.encoding = 'UTF-8'
+tasks.withType(JavaCompile) {
+    options.encoding ="UTF-8"
+}
+java{
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+    implementation group: 'org.json', name: 'json', version: '20200518'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.2.9.RELEASE'
+    implementation group: 'org.springframework', name: 'spring-web', version: '5.2.9.RELEASE'
+
+
+    implementation name: 'jsp-api'
+}
