@@ -35,9 +35,14 @@ public abstract class GroupLoopHandler<T> {
     public void increaseCounter(){
         manualCount++;
     }
+    public void always(){}
     public long start(){
-        setCatchSourceInLoop();
-        terminalGroup(this.source);
-        return manualCount == 0? autoCount: manualCount;
+        try{
+            setCatchSourceInLoop();
+            terminalGroup(this.source);
+            return manualCount == 0? autoCount: manualCount;
+        }finally {
+            always();
+        }
     }
 }

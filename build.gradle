@@ -3,7 +3,7 @@ plugins{
 }
 
 group 'org.tony'
-version '3.3.1'
+version '3.3.2'
 
 repositories {
     flatDir dirs: 'libs'
@@ -25,7 +25,6 @@ dependencies {
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
     implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.2.9.RELEASE'
     implementation group: 'org.springframework', name: 'spring-web', version: '5.2.9.RELEASE'
-
 
     implementation name: 'jsp-api'
 }
