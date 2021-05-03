@@ -3,10 +3,9 @@ plugins{
 }
 
 group 'org.tony'
-version '3.3.2'
+version '3.4.0'
 
 repositories {
-    flatDir dirs: 'libs'
     mavenCentral()
 }
 compileJava.options.encoding = 'UTF-8'
@@ -26,5 +25,5 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.2.9.RELEASE'
     implementation group: 'org.springframework', name: 'spring-web', version: '5.2.9.RELEASE'
 
-    implementation name: 'jsp-api'
+    implementation files('libs/jsp-api.jar')
 }
