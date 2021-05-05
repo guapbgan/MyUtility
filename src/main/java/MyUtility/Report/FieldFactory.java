@@ -32,8 +32,7 @@ public class FieldFactory {
     private int fieldCount = 0;
 
     public <T> Field createField(String title, String dbField, Class<T> type){
-        fieldCount ++;
-        return new Field(fieldCount, title, dbField, type);
+        return new Field(fieldCount++, title, dbField, type);
     }
 
     public static void writeNewSheetRowWithData(Map<String, Field> fieldMap, SXSSFSheet sheet, ResultSet mainResultSet, MathContext mathContext, Map<String, Object> specialDataMap) throws SQLException {
