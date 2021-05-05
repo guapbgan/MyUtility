@@ -11,6 +11,10 @@ import java.sql.SQLException;
 import java.util.Map;
 
 public class FieldFactory {
+    public interface FieldCallback{
+        void run(String fieldId, FieldFactory.Field field);
+    }
+
     public static class Field {
         public final int COLUMN_INDEX;
         public final String TITLE;
@@ -69,5 +73,13 @@ public class FieldFactory {
             }
         }
     }
+
+    public static void loopThroughFields(Map<String, FieldFactory.Field> fieldMap, FieldCallback fieldCallback) {
+        for(Map.Entry<String, FieldFactory.Field> entry: fieldMap.entrySet()){
+            fieldCallback.run(entry.getKey(), entry.getValue());
+        }
+    }
+
+
 }
 
