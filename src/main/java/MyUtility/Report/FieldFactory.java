@@ -8,6 +8,8 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import java.math.MathContext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class FieldFactory {
@@ -32,12 +34,22 @@ public class FieldFactory {
     }
 
     private int fieldCount = 0;
+    private HashSet<String> idChecker = new HashSet<>();
+
+    private void checkId(String id){
+        if(idChecker.contains(id)){
+            throw new FieldFactoryException(String.format("ID %s is duplicated", id));
+        }
+        idChecker.add(id);
+    }
 
     public <T> Field createField(String id, String title, String dbField, Class<T> type){
+        checkId(id);
         return new Field(fieldCount++, id, title, dbField, type);
     }
 
     public <T> Field createField(String id, String title, Class<T> type){
+        checkId(id);
         return new Field(fieldCount++, id, title, null, type);
     }
 
