@@ -19,20 +19,26 @@ public class FieldFactory {
         public final int COLUMN_INDEX;
         public final String TITLE;
         public final String DB_FIELD;
+        public final String ID;
         public final Class TYPE;
 
-        private <T> Field(int fieldCount, String title, String dbField, Class<T> type){
+        private <T> Field(int fieldCount, String id, String title, String dbField, Class<T> type){
             this.COLUMN_INDEX = fieldCount;
             this.TITLE = title;
             this.DB_FIELD = dbField;
+            this.ID = id;
             this.TYPE = type;
         }
     }
 
     private int fieldCount = 0;
 
-    public <T> Field createField(String title, String dbField, Class<T> type){
-        return new Field(fieldCount++, title, dbField, type);
+    public <T> Field createField(String id, String title, String dbField, Class<T> type){
+        return new Field(fieldCount++, id, title, dbField, type);
+    }
+
+    public <T> Field createField(String id, String title, Class<T> type){
+        return new Field(fieldCount++, id, title, null, type);
     }
 
     public static void writeNewSheetRowWithData(Map<String, Field> fieldMap, SXSSFSheet sheet, ResultSet mainResultSet, MathContext mathContext, Map<String, Object> specialDataMap) throws SQLException {
