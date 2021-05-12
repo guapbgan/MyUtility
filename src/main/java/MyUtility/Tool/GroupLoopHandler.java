@@ -8,6 +8,7 @@ public abstract class GroupLoopHandler<T> {
     }
 
     private boolean firstGroup = true;
+    private boolean executeCacheSource = false;
     private T source;
     private long manualCount = 0, autoCount = 0;
     public abstract boolean needNewGroup(T source);
@@ -21,6 +22,9 @@ public abstract class GroupLoopHandler<T> {
     public abstract void setCatchSourceInLoop();
     public abstract void process(T source);
     public void catchSource(T source){
+        if(!executeCacheSource){
+            executeCacheSource = true;
+        }
         this.source = source;
         if (needNewGroup(this.source)) {
             if (!firstGroup) {
@@ -39,7 +43,9 @@ public abstract class GroupLoopHandler<T> {
     public long start(){
         try{
             setCatchSourceInLoop();
-            terminalGroup(this.source);
+            if(executeCacheSource){
+                terminalGroup(this.source);
+            }
             return manualCount == 0? autoCount: manualCount;
         }finally {
             always();
