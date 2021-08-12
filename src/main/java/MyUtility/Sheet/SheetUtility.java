@@ -26,25 +26,41 @@ public class SheetUtility{
         if(sheet instanceof SXSSFSheet){
             throw new SheetUtilityException("SXSSFSheet is not supported by this method");
         }
+
         Row row;
-        Cell cell;
-        row = sheet.getRow(rowIndex);
-        if(row == null){
+        if(isNullRow(sheet, rowIndex)){
             row = sheet.createRow(rowIndex);
+        }else{
+            row = sheet.getRow(rowIndex);
         }
-        cell = row.getCell(columnIndex);
-        if(cell == null){
+
+        Cell cell;
+        if(isNullCell(row, columnIndex)){
             cell = row.createCell(columnIndex);
+        }else{
+            cell = row.getCell(columnIndex);
         }
         return cell;
     }
 
+    public static boolean isNullRow(Sheet sheet, int rowIndex){
+        return sheet.getRow(rowIndex) == null;
+    }
+
+    public static boolean isNullCell(Row row, int columnIndex){
+        return row.getCell(columnIndex) == null;
+    }
+
+    public static boolean isNullCell(Sheet sheet, int rowIndex, int columnIndex){
+        return isNullRow(sheet, rowIndex) || sheet.getRow(rowIndex).getCell(columnIndex) == null;
+    }
 
     public static Cell locateCell(Row row, int columnIndex){
         Cell cell;
-        cell = row.getCell(columnIndex);
-        if(cell == null){
+        if(isNullCell(row, columnIndex)){
             cell = row.createCell(columnIndex);
+        }else{
+            cell = row.getCell(columnIndex);
         }
         return cell;
     }
@@ -92,13 +108,21 @@ public class SheetUtility{
     }
 
     public static String getStringValue(Row row, int columnIndex) {
+        if(isNullCell(row, columnIndex)){
+            return "";
+        }
         Cell cell = locateCell(row, columnIndex);
         return generalGetString(cell);
     }
+
     public static String getStringValue(Sheet sheet,int rowIndex, int columnIndex){
+        if(isNullCell(sheet, rowIndex, columnIndex)){
+            return "";
+        }
         Cell cell = locateCell(sheet, rowIndex, columnIndex);
         return generalGetString(cell);
     }
+
     private static String generalGetString(Cell cell) {
         CellType cellType;
         try{
@@ -114,13 +138,21 @@ public class SheetUtility{
     }
 
     public static Integer getIntValue(Row row, int columnIndex){
+        if(isNullCell(row, columnIndex)){
+            return 0;
+        }
         Cell cell = locateCell(row, columnIndex);
         return generalGetInteger(cell);
     }
+
     public static Integer getIntValue(Sheet sheet,int rowIndex, int columnIndex){
+        if(isNullCell(sheet, rowIndex, columnIndex)){
+            return 0;
+        }
         Cell cell = locateCell(sheet, rowIndex, columnIndex);
         return generalGetInteger(cell);
     }
+
     private static Integer generalGetInteger(Cell cell) {
         CellType cellType;
         try{
@@ -135,14 +167,52 @@ public class SheetUtility{
         return getIntegerByCellType(cellType, cell);
     }
 
+    public static long getLongValue(Row row, int columnIndex){
+        if(isNullCell(row, columnIndex)){
+            return 0L;
+        }
+        Cell cell = locateCell(row, columnIndex);
+        return generalGetLong(cell);
+    }
+
+    public static long getLongValue(Sheet sheet,int rowIndex, int columnIndex){
+        if(isNullCell(sheet, rowIndex, columnIndex)){
+            return 0L;
+        }
+        Cell cell = locateCell(sheet, rowIndex, columnIndex);
+        return generalGetLong(cell);
+    }
+
+    private static long generalGetLong(Cell cell) {
+        CellType cellType;
+        try{
+            cellType = cell.getCellType();
+        }catch (NoSuchMethodError ex){
+            cellType = cell.getCellTypeEnum();
+        }
+
+        if (cellType == CellType.FORMULA) {
+            return getLongByCellType(cell.getCachedFormulaResultType(), cell);
+        }
+        return getLongByCellType(cellType, cell);
+    }
+
     public static Double getDoubleValue(Row row, int columnIndex){
+        if(isNullCell(row, columnIndex)){
+            return 0d;
+        }
         Cell cell = locateCell(row, columnIndex);
         return generalGetDouble(cell);
     }
+
     public static Double getDoubleValue(Sheet sheet,int rowIndex, int columnIndex){
+        if(isNullCell(sheet, rowIndex, columnIndex)){
+            return 0d;
+        }
         Cell cell = locateCell(sheet, rowIndex, columnIndex);
         return generalGetDouble(cell);
     }
+
     private static Double generalGetDouble(Cell cell) {
         CellType cellType;
         try{
@@ -157,15 +227,22 @@ public class SheetUtility{
         return getDoubleByCellType(cellType, cell);
     }
 
-
     public static Date getDateValue(Row row, int columnIndex){
+        if(isNullCell(row, columnIndex)){
+            return null;
+        }
         Cell cell = locateCell(row, columnIndex);
         return generalGetDate(cell);
     }
+
     public static Date getDateValue(Sheet sheet,int rowIndex, int columnIndex){
+        if(isNullCell(sheet, rowIndex, columnIndex)){
+            return null;
+        }
         Cell cell = locateCell(sheet, rowIndex, columnIndex);
         return generalGetDate(cell);
     }
+
     private static Date generalGetDate(Cell cell) {
         CellType cellType;
         try{
@@ -196,6 +273,7 @@ public class SheetUtility{
                 return "";
         }
     }
+
     private static int getIntegerByCellType(CellType cellType, Cell cell) {
         switch (cellType){
             case STRING:
@@ -215,6 +293,27 @@ public class SheetUtility{
                 throw new SheetUtilityException("Unknown CellType");
         }
     }
+
+    private static long getLongByCellType(CellType cellType, Cell cell) {
+        switch (cellType){
+            case STRING:
+                if("".equals(cell.getStringCellValue())){
+                    return 0L;
+                }
+                return Long.parseLong(cell.getStringCellValue());
+            case NUMERIC:
+                return BigDecimal.valueOf(cell.getNumericCellValue()).longValue();
+            case BOOLEAN:
+                return cell.getBooleanCellValue()? 1L: 0L;
+            case ERROR:
+                throw new SheetUtilityException("CellType of Error can not get long");
+            case BLANK:
+                return 0L;
+            default:
+                throw new SheetUtilityException("Unknown CellType");
+        }
+    }
+
     private static Double getDoubleByCellType(CellType cellType, Cell cell){
         switch (cellType){
             case STRING:
