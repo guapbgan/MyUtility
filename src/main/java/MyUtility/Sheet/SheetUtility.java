@@ -5,13 +5,23 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 public class SheetUtility{
+    private static final DataFormatter dataFormatter = new DataFormatter();
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("^-?\\d+(\\.\\d+)?$");
+
+    static {
+        dataFormatter.addFormat("m/d/yy", new SimpleDateFormat("yyyy/MM/dd"));
+    }
+
     private SheetUtility(){
         //not instantiable
     }
+
     private static class SheetUtilityException extends RuntimeException{
         final String message;
         public SheetUtilityException(String message){
@@ -54,6 +64,10 @@ public class SheetUtility{
     public static boolean isNullCell(Sheet sheet, int rowIndex, int columnIndex){
         return isNullRow(sheet, rowIndex) || sheet.getRow(rowIndex).getCell(columnIndex) == null;
     }
+
+    private static boolean isPureNumber(String value){
+        return NUMBER_PATTERN.matcher(value).matches();
+    };
 
     public static Cell locateCell(Row row, int columnIndex){
         Cell cell;
@@ -263,7 +277,12 @@ public class SheetUtility{
             case STRING:
                 return cell.getStringCellValue();
             case NUMERIC:
-                return BigDecimal.valueOf(cell.getNumericCellValue()).stripTrailingZeros().toPlainString().replaceAll("\\.0$", "");
+                String value = dataFormatter.formatCellValue(cell);
+                if(isPureNumber(value)){
+                    return new BigDecimal(dataFormatter.formatCellValue(cell)).stripTrailingZeros().toPlainString();
+                }else{
+                    return value;
+                }
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
             case ERROR:
